@@ -1,0 +1,81 @@
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --forest: #1b5e20; --forest-2: #2e7d32; --mint: #e8f5e9; --mint-2: #c8e6c9; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  @apply bg-white text-ink font-sans antialiased;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full font-semibold
+           transition-all duration-200 focus-visible:outline-none
+           focus-visible:ring-2 focus-visible:ring-forest-700 focus-visible:ring-offset-2;
+  }
+  .btn-primary {
+    @apply btn bg-forest-800 text-white px-7 py-3 text-sm hover:bg-forest-900
+           hover:shadow-float active:scale-[.98];
+  }
+  .btn-outline {
+    @apply btn border-2 border-forest-700 text-forest-800 px-7 py-3 text-sm
+           hover:bg-mint-50 active:scale-[.98];
+  }
+  .btn-sm { @apply px-5 py-2 text-xs; }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-card border border-mint-100;
+  }
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-xl rounded-2xl shadow-float border border-white/60;
+  }
+  .section-label {
+    @apply text-xs font-bold tracking-[0.2em] uppercase text-forest-700;
+  }
+  .input-field {
+    @apply w-full rounded-xl border border-mint-200 bg-white px-4 py-3 text-sm
+           text-ink placeholder:text-ink-soft/60
+           hover:border-mint-300
+           focus:border-forest-700 focus:ring-2 focus:ring-forest-700/15 focus:outline-none
+           transition;
+  }
+  select.input-field,
+  .select-field {
+    @apply w-full appearance-none rounded-xl border border-mint-200 bg-white
+           py-3 pl-4 pr-11 text-sm font-medium text-ink
+           hover:border-mint-300 hover:bg-mint-50/40
+           focus:border-forest-700 focus:ring-2 focus:ring-forest-700/15 focus:outline-none
+           transition cursor-pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232e7d32' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.9rem center;
+    background-size: 1rem;
+  }
+  select.input-field option,
+  .select-field option {
+    @apply bg-white text-ink py-2;
+  }
+  .icon-chip {
+    @apply inline-flex items-center justify-center rounded-xl w-11 h-11;
+  }
+}
+
+.hero-wash {
+  background:
+    radial-gradient(60rem 30rem at 85% -10%, rgba(200, 230, 201, 0.55), transparent 60%),
+    radial-gradient(50rem 26rem at -10% 20%, rgba(232, 245, 233, 0.9), transparent 55%),
+    linear-gradient(180deg, #f4faf4 0%, #ffffff 70%);
+}
+
+.reveal { opacity: 1; transform: none; }
+.reveal.reveal-anim { opacity: 0; transform: translateY(20px); transition: opacity .65s ease, transform .65s ease; }
+.reveal.reveal-anim.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal.reveal-anim { opacity: 1; transform: none; transition: none; }
+}
+

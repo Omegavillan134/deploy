@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: cvsu
+          POSTGRES_PASSWORD: cvsu
+          POSTGRES_DB: cvsu
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U cvsu"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+            - run: npm install
+      - name: Prepare env for CI
+        run: |
+          cp .env.example .env
+          # Override with the Postgres service that GitHub Actions starts
+          sed -i 's|^DATABASE_URL=.*|DATABASE_URL="postgresql://cvsu:cvsu@localhost:5432/cvsu"|' .env
+          # Make sure these exist and are long enough
+          sed -i 's|^NEXTAUTH_SECRET=.*|NEXTAUTH_SECRET="ci-secret-at-least-32-characters-long"|' .env
+          sed -i 's|^NEXTAUTH_URL=.*|NEXTAUTH_URL="http://localhost:3000"|' .env
+      - run: npm run doctor
+      - run: cp .env.example .env
+      - run: npm run doctor
+      - run: npx prisma migrate deploy || npx prisma db push
+      - run: npm run db:seed
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build
+      - name: Boot app and run smoke test
+        run: |
+          npm run start & sleep 8
+          npm run test:smoke

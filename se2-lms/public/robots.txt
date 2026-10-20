@@ -1,0 +1,13 @@
+# CVSU LMS — robots.txt
+User-agent: *
+Allow: /
+Allow: /login
+Allow: /register
+Allow: /forgot-password
+
+# Sensitive / authenticated areas
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /admin
+
+Sitemap: https://cvsulms.vercel.app/sitemap.xml

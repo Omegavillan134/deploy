@@ -1,0 +1,357 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum Visibility {
+  PUBLIC
+  CLASS_ONLY
+  PRIVATE
+}
+
+enum SubmissionStatus {
+  SUBMITTED
+  LATE
+  RETURNED
+  GRADED
+}
+
+enum OtpPurpose {
+  LOGIN
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+enum AuthMethod {
+  PASSWORD
+  OTP
+  QR
+  NFC
+  MAGIC_LINK
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  passwordHash  String?
+  firstName     String
+  lastName      String
+  role          Role     @default(STUDENT)
+  avatarUrl     String?
+  studentNumber String?  @unique
+  approved      Boolean  @default(true) 
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  enrollments   Enrollment[]
+  taughtClasses Class[]      @relation("TeacherClasses")
+  submissions   Submission[]
+  notifications Notification[]
+  attendance      AttendanceRecord[] @relation("Attendance")
+  sessions      AuthSession[]
+  devices       Device[]
+  otpCodes      OtpCode[]
+  qrTokens      QrToken[]
+  magicTokens   MagicToken[]
+  enrolledMethods AuthMethodEnrollment[]
+  nfcCredentials  NfcCredential[]
+}
+
+model AuthSession {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash        String   @unique
+  deviceId         String?
+  device           Device?  @relation(fields: [deviceId], references: [id])
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+  ip               String?
+  userAgent        String?
+  fpHash           String? 
+}
+
+model Device {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fingerprint   String
+  name          String   
+  trusted       Boolean  @default(false) 
+  lastSeenAt    DateTime @default(now())
+  sessions      AuthSession[]
+  @@unique([userId, fingerprint])
+}
+
+model OtpCode {
+  id          String     @id @default(cuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash    String
+  channel     String     
+  purpose     OtpPurpose @default(LOGIN)
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  attempts    Int        @default(0)
+  createdAt   DateTime   @default(now())
+
+  @@index([userId])
+}
+
+model QrToken {
+  id        String    @id @default(cuid())
+  userId    String?
+  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model MagicToken {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+}
+
+model NfcCredential {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialId String   @unique 
+  label        String?
+  createdAt    DateTime @default(now())
+}
+
+model AuthMethodEnrollment {
+  id         String     @id @default(cuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  method     AuthMethod
+  enabled    Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  @@unique([userId, method])
+}
+
+model Class {
+  id          String   @id @default(cuid())
+  name        String
+  section     String?
+  code        String   @unique 
+  description String?
+  archivedAt  DateTime?
+  teacherId   String
+  teacher     User     @relation("TeacherClasses", fields: [teacherId], references: [id])
+  createdAt   DateTime @default(now())
+  enrollments Enrollment[]
+  announcements Announcement[]
+  assignments Assignment[]
+  materials   Material[]
+  events      CalendarEvent[]
+  meetings    ClassMeeting[]
+  attendance  AttendanceRecord[]
+}
+
+model Enrollment {
+  id       String   @id @default(cuid())
+  classId  String
+  class    Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt DateTime @default(now())
+  @@unique([classId, userId])
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  authorId  String
+  title     String
+  body      String   
+  createdAt DateTime @default(now())
+  attachments Attachment[]
+
+  @@index([classId])
+}
+
+model Assignment {
+  id          String    @id @default(cuid())
+  classId     String
+  class       Class     @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title       String
+  instructions String?
+  points      Int       @default(100)
+  dueAt       DateTime?
+  createdAt   DateTime  @default(now())
+  attachments Attachment[]
+  submissions Submission[]
+
+  @@index([classId])
+}
+
+model Submission {
+  id           String           @id @default(cuid())
+  assignmentId String
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  body         String?
+  status       SubmissionStatus @default(SUBMITTED)
+  grade        Float?
+  feedback     String?
+  submittedAt  DateTime         @default(now())
+  returnedAt   DateTime?
+  attachments  Attachment[]
+
+  @@index([assignmentId])
+  @@index([studentId])
+}
+
+model Material {
+  id        String   @id @default(cuid())
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  folderId  String?
+  title     String
+  kind      String   
+  url       String
+  createdAt DateTime @default(now())
+}
+
+model Attachment {
+  id            String   @id @default(cuid())
+  fileUrl       String   
+  data          String?  @db.Text 
+  fileName      String
+  mimeType      String
+  sizeBytes     Int
+  announcementId String?
+  announcement  Announcement? @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  assignmentId  String?
+  assignment    Assignment?   @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  submissionId  String?
+  submission    Submission?   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([assignmentId])
+  @@index([submissionId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId, readAt])
+}
+
+model PendingRegistration {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  firstName    String
+  lastName     String
+  passwordHash String
+  role         Role     @default(STUDENT)
+  codeHash     String
+  expiresAt    DateTime
+  attempts     Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+enum EventKind {
+  CLASS
+  HOMEWORK
+  EXAM
+  ACTIVITY
+  PRESENTATION
+}
+
+enum AttStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+model CalendarEvent {
+  id          String    @id @default(cuid())
+  classId     String?
+  class       Class?    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  title       String
+  description String?   @db.Text
+  kind        EventKind @default(ACTIVITY)
+  color       String?   
+  startsAt    DateTime
+  endsAt      DateTime?
+  createdById String?
+  createdAt   DateTime  @default(now())
+}
+
+model ClassMeeting {
+  id        String @id @default(cuid())
+  classId   String
+  class     Class  @relation(fields: [classId], references: [id], onDelete: Cascade)
+  dayOfWeek Int    
+  startTime String 
+  endTime   String
+}
+
+model AttendanceRecord {
+  id         String   @id @default(cuid())
+  classId    String
+  class      Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  studentId  String
+  student    User     @relation("Attendance", fields: [studentId], references: [id], onDelete: Cascade)
+  date       DateTime @db.Date
+  status     AttStatus @default(PRESENT)
+  markedById String
+  updatedAt  DateTime @updatedAt
+  @@unique([classId, studentId, date])
+}
+
+model Holiday {
+  id        String   @id @default(cuid())
+  name      String
+  date      DateTime @db.Date
+  recurring Boolean  @default(false) 
+  createdAt DateTime @default(now())
+}
+
+model SecurityEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String   
+  ip        String?
+  detail    String?
+  createdAt DateTime @default(now())
+  @@index([type, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String   
+  target    String?
+  meta      Json?
+  ip        String?
+  createdAt DateTime @default(now())
+}
