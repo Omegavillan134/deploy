@@ -29,7 +29,7 @@ export default async function ClassesPage() {
           </p>
         </div>
         {user.role === "STUDENT" && <JoinClassForm />}
-        {user.role === "TEACHER" && <CreateClassForm />}
+        {(user.role === "TEACHER" || user.role === "ADMIN") && <CreateClassForm />}
       </div>
 
       {classes.length === 0 ? (
