@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getClassAccess } from "@/lib/class-access";
 import SubmissionForm from "@/components/dashboard/SubmissionForm";
 import GradingPanel from "@/components/dashboard/GradingPanel";
+import LocalDateTime from "@/components/ui/LocalDateTime";
 import Icon from "@/components/ui/Icon";
 
 export default async function AssignmentPage({
@@ -44,7 +45,7 @@ export default async function AssignmentPage({
           <div className="flex-1">
             <h1 className="text-2xl font-extrabold text-forest-900 tracking-tight">{assignment.title}</h1>
             <p className="mt-1.5 text-sm text-ink-soft">
-              {cls.name} · due {assignment.dueAt ? new Date(assignment.dueAt).toLocaleString() : "anytime"} · {assignment.points} points
+              {cls.name} · due {assignment.dueAt ? <LocalDateTime value={assignment.dueAt} /> : "anytime"} · {assignment.points} points
               {overdue && <span className="ml-2 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-bold text-red-700">past due</span>}
             </p>
           </div>
@@ -95,7 +96,9 @@ export default async function AssignmentPage({
                   : mySubmission.status === "RETURNED" ? "bg-amber-50 text-amber-700"
                   : "bg-sky-50 text-sky-700"
                 }`}>{mySubmission.status.replace("_", " ").toLowerCase()}</span>
-                <span className="text-xs text-ink-soft">submitted {new Date(mySubmission.submittedAt).toLocaleString()}</span>
+                <span className="text-xs text-ink-soft">
+                  submitted <LocalDateTime value={mySubmission.submittedAt} />
+                </span>
               </div>
               {mySubmission.body && (
                 <div className="rounded-xl border border-mint-100 p-4 text-sm text-ink whitespace-pre-wrap">{mySubmission.body}</div>

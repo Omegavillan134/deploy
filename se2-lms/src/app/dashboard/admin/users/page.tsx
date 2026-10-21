@@ -1,8 +1,7 @@
 import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
-import RoleSelect from "@/components/dashboard/admin/RoleSelect";
-import ApproveButton from "@/components/dashboard/admin/ApproveButton";
+import UsersClient from "@/components/dashboard/admin/UsersClient";
 
 export default async function AdminUsersPage() {
   const user = (await getSessionUser())!;
@@ -11,15 +10,25 @@ export default async function AdminUsersPage() {
   const users = await db.user.findMany({ orderBy: { createdAt: "asc" } });
   const pendingTeachers = users.filter((u) => u.role === "TEACHER" && !u.approved);
 
+  const serialized = users.map((u) => ({
+    id: u.id,
+    firstName: u.firstName,
+    lastName: u.lastName,
+    email: u.email,
+    role: u.role as "STUDENT" | "TEACHER" | "ADMIN",
+    approved: u.approved,
+    createdAt: u.createdAt.toISOString(),
+  }));
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 max-w-5xl mx-auto">
       <div>
         <h1 className="text-2xl font-extrabold text-forest-900 tracking-tight">User management</h1>
         <p className="text-sm text-ink-soft mt-1">{users.length} accounts</p>
       </div>
 
       {pendingTeachers.length > 0 && (
-        <div className="card border-l-4 border-l-amber-500 p-5">
+        <div className="card border-l-4 border-l-amber-500 p-4 sm:p-5">
           <p className="text-sm font-bold text-amber-800">
             {pendingTeachers.length} teacher account{pendingTeachers.length === 1 ? "" : "s"} awaiting approval
           </p>
@@ -29,41 +38,7 @@ export default async function AdminUsersPage() {
         </div>
       )}
 
-      <div className="card overflow-x-auto">
-        <table className="w-full min-w-[720px] text-sm">
-          <thead>
-            <tr className="border-b border-mint-100 text-left text-xs text-ink-soft">
-              <th className="px-5 py-3 font-semibold">Name</th>
-              <th className="px-5 py-3 font-semibold">Email</th>
-              <th className="px-5 py-3 font-semibold">Role</th>
-              <th className="px-5 py-3 font-semibold">Status</th>
-              <th className="px-5 py-3 font-semibold">Joined</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id} className="border-b border-mint-50 last:border-0">
-                <td className="px-5 py-3 font-medium text-ink">
-                  {u.firstName} {u.lastName}
-                  {u.id === user.id && <span className="ml-2 text-[10px] font-bold text-forest-700">(you)</span>}
-                </td>
-                <td className="px-5 py-3 text-ink-soft">{u.email}</td>
-                <td className="px-5 py-3">
-                  <RoleSelect userId={u.id} role={u.role} disabled={u.id === user.id} />
-                </td>
-                <td className="px-5 py-3">
-                  {u.role === "TEACHER" && !u.approved ? (
-                    <ApproveButton userId={u.id} />
-                  ) : (
-                    <span className="rounded-full bg-mint-100 px-3 py-1 text-[11px] font-bold text-forest-700">Active</span>
-                  )}
-                </td>
-                <td className="px-5 py-3 text-ink-soft">{u.createdAt.toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <UsersClient users={serialized} currentUserId={user.id} />
     </div>
   );
 }

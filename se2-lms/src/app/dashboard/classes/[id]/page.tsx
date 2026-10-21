@@ -5,6 +5,7 @@ import { getClassAccess } from "@/lib/class-access";
 import PostAnnouncement from "@/components/dashboard/class/PostAnnouncement";
 import CreateAssignment from "@/components/dashboard/class/CreateAssignment";
 import AddMaterial from "@/components/dashboard/class/AddMaterial";
+import LocalDateTime from "@/components/ui/LocalDateTime";
 import Icon from "@/components/ui/Icon";
 
 export default async function ClassPage({
@@ -67,7 +68,7 @@ export default async function ClassPage({
       </div>
 
       {tab === "stream" && (
-        <div className="max-w-3xl space-y-5">
+        <div className="space-y-5">
           {isTeacher && <PostAnnouncement classId={cls.id} />}
           {announcements.length === 0 && <p className="text-sm text-ink-soft">No announcements yet.</p>}
           {announcements.map((a) => (
@@ -78,7 +79,9 @@ export default async function ClassPage({
                 </span>
                 <div>
                   <p className="font-bold text-ink">{a.title}</p>
-                  <p className="text-xs text-ink-soft">{new Date(a.createdAt).toLocaleString()}</p>
+                  <p className="text-xs text-ink-soft">
+                    <LocalDateTime value={a.createdAt} />
+                  </p>
                 </div>
               </div>
               <div className="mt-4 text-sm text-ink leading-relaxed" dangerouslySetInnerHTML={{ __html: a.body }} />
@@ -88,9 +91,9 @@ export default async function ClassPage({
       )}
 
       {tab === "classwork" && (
-        <div className="max-w-3xl space-y-6">
+        <div className="space-y-5">
           {isTeacher && (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               <CreateAssignment classId={cls.id} />
               <AddMaterial classId={cls.id} />
             </div>
@@ -104,7 +107,9 @@ export default async function ClassPage({
                   <span className="icon-chip bg-sky-50 text-sky-600"><Icon name="assignment" className="" /></span>
                   <div className="flex-1">
                     <p className="font-semibold text-ink">{a.title}</p>
-                    <p className="text-xs text-ink-soft mt-0.5">due {a.dueAt ? new Date(a.dueAt).toLocaleDateString() : "—"} · {a.points} pts</p>
+                    <p className="text-xs text-ink-soft mt-0.5">
+                      due {a.dueAt ? <LocalDateTime value={a.dueAt} /> : "—"} · {a.points} pts
+                    </p>
                   </div>
                   <Icon name="chevron_right" className=" text-ink-soft" />
                 </Link>
@@ -130,7 +135,7 @@ export default async function ClassPage({
       )}
 
       {tab === "people" && (
-        <div className="max-w-3xl">
+        <div className="space-y-5">
           <section className="card p-6">
             <h2 className="font-bold text-forest-900">Teacher</h2>
             <div className="mt-4 flex items-center gap-3">
