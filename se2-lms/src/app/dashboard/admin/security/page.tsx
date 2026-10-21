@@ -27,7 +27,6 @@ export default async function SecurityDashboardPage() {
         <p className="text-sm text-ink-soft mt-1">Suspicious activity, failed logins, and rate-limit hits.</p>
       </div>
 
-      {/* Stat boxes — equal width, no awkward empty 4th column */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {stats.map((s) => (
           <div key={s.label} className="card px-4 py-4 text-center">
