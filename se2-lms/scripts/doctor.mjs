@@ -53,7 +53,7 @@ if (existsSync(path.join(root, ".env"))) {
 
 try {
   const s = readFileSync(path.join(root, "prisma/schema.prisma"), "utf8");
-  for (const model of ["User", "Class", "Assignment", "Submission", "Notification", "QrToken", "NfcCredential"])
+  for (const model of ["User", "Class", "Assignment", "Submission", "Notification"])
     s.includes(`model ${model} `) ? ok(`schema model ${model}`) : err(`schema missing model ${model}`);
 } catch { err("could not read prisma/schema.prisma"); }
 

@@ -36,7 +36,7 @@ export async function establishSession(
   setSessionCookie(token);
 }
 
-export async function enrollMethod(userId: string, method: "PASSWORD" | "OTP" | "QR" | "NFC" | "MAGIC_LINK") {
+export async function enrollMethod(userId: string, method: "PASSWORD" | "OTP") {
   await db.authMethodEnrollment.upsert({
     where: { userId_method: { userId, method } },
     update: { enabled: true },

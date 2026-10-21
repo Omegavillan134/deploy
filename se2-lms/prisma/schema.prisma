@@ -35,9 +35,6 @@ enum OtpPurpose {
 enum AuthMethod {
   PASSWORD
   OTP
-  QR
-  NFC
-  MAGIC_LINK
 }
 
 model User {
@@ -61,10 +58,7 @@ model User {
   sessions      AuthSession[]
   devices       Device[]
   otpCodes      OtpCode[]
-  qrTokens      QrToken[]
-  magicTokens   MagicToken[]
   enrolledMethods AuthMethodEnrollment[]
-  nfcCredentials  NfcCredential[]
 }
 
 model AuthSession {
@@ -106,35 +100,6 @@ model OtpCode {
   createdAt   DateTime   @default(now())
 
   @@index([userId])
-}
-
-model QrToken {
-  id        String    @id @default(cuid())
-  userId    String?
-  user      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash String    @unique
-  expiresAt DateTime
-  consumedAt DateTime?
-  createdAt DateTime  @default(now())
-}
-
-model MagicToken {
-  id         String    @id @default(cuid())
-  userId     String
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tokenHash  String    @unique
-  expiresAt  DateTime
-  consumedAt DateTime?
-  createdAt  DateTime  @default(now())
-}
-
-model NfcCredential {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  credentialId String   @unique 
-  label        String?
-  createdAt    DateTime @default(now())
 }
 
 model AuthMethodEnrollment {

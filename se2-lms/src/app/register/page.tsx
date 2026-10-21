@@ -179,9 +179,7 @@ export default function RegisterPage() {
       <div className="flex w-full max-w-[420px] flex-col items-center">
         <div className="card w-full !rounded-3xl p-8 sm:p-10 shadow-float">
           <div className="mb-8 flex items-center gap-3">
-            <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-forest-800 text-base font-extrabold text-white shadow-card">
-              CV
-            </span>
+            <img src="/logo.png" alt="CVSU LMS" className="h-11 w-11 rounded-xl shadow-card object-cover" />
             <span className="leading-tight">
               <span className="block text-lg font-extrabold tracking-tight text-forest-900">
                 CVSU LMS

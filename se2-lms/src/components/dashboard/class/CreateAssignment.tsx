@@ -63,11 +63,11 @@ export default function CreateAssignment({ classId }: { classId: string }) {
       {error && <p role="alert" className="text-xs font-semibold text-red-700 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
       <input name="title" required placeholder="Title" className="input-field !bg-white" />
       <textarea name="instructions" rows={4} placeholder="Instructions (optional)" className="input-field !bg-white resize-y" />
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         <label className="text-xs font-bold text-ink">Points
           <input name="points" type="number" min={0} defaultValue={100} className="input-field !bg-white mt-1.5" />
         </label>
-        <label className="text-xs col-span-2 font-bold text-ink">Due date
+        <label className="text-xs font-bold text-ink">Due date
           <input name="dueAt" type="datetime-local" className="input-field !bg-white mt-1.5" />
         </label>
       </div>

@@ -81,9 +81,7 @@ export default function DashboardShell({
     <div className="min-h-screen bg-mint-50/40">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-mint-100 bg-white lg:flex">
         <div className="flex h-16 items-center gap-3 px-6 border-b border-mint-100">
-          <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-forest-800 text-white font-extrabold">
-            C
-          </span>
+          <img src="/logo.png" alt="CVSU LMS" className="w-9 h-9 rounded-xl object-cover" />
           <span className="leading-tight">
             <span className="block font-extrabold text-forest-900">CVSU LMS</span>
             <span className="block text-[10px] text-ink-soft">Learning Management System</span>

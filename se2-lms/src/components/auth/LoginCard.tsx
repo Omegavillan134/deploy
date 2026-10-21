@@ -120,7 +120,7 @@ export default function LoginCard() {
     <div className="w-full max-w-[400px]">
       <div className="card !rounded-3xl shadow-float p-8 sm:p-10">
         <div className="flex items-center gap-3 mb-8">
-          <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-forest-800 text-white font-extrabold text-base shadow-card">CV</span>
+          <img src="/logo.png" alt="CVSU LMS" className="w-11 h-11 rounded-xl shadow-card object-cover" />
           <span className="leading-tight">
             <span className="block text-lg font-extrabold text-forest-900 tracking-tight">CVSU LMS</span>
             <span className="block text-[11px] text-ink-soft mt-0.5">Learning Management System</span>

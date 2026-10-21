@@ -22,7 +22,6 @@ export default async function SecurityDashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { label: "Failed logins", value: count("FAILED_LOGIN"), color: "text-red-600" },
-          { label: "Suspicious exams", value: count("SUSPICIOUS_EXAM"), color: "text-amber-600" },
           { label: "Rate limited", value: count("RATE_LIMITED"), color: "text-amber-600" },
           { label: "Doc parse failures", value: count("DOC_PARSE_FAILED"), color: "text-ink" },
         ].map((s) => (
